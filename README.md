@@ -1,6 +1,6 @@
 # Le Registre — Devis & Factures
 
-Générateur de devis et factures pour indépendants et PME, **100 % hors ligne**.
+Générateur de devis et factures pour indépendants et PM, **100 % hors ligne**.
 Aucun serveur, aucune base de données distante : toutes les données (clients,
 articles, devis, factures) sont stockées dans le navigateur de l'utilisateur
 via IndexedDB.
