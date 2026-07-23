@@ -1,8 +1,8 @@
-# Activer la connexion par e-mail et l'assistant (facultatif)
+# Activer les services en ligne
 
-Ces deux fonctionnalités sont **optionnelles**. Sans elles, l'application
-continue de fonctionner exactement comme avant : 100 % hors ligne, données
-stockées uniquement sur l'appareil.
+La connexion par e-mail, la synchronisation, l'assistant IA et l'envoi
+automatique des PDF reposent sur Firebase. Une copie locale reste disponible
+sur chaque appareil pour préserver l'accès aux documents.
 
 ## 1. Créer un projet Firebase
 
@@ -35,7 +35,7 @@ firebase deploy --only firestore:rules,storage:rules
 Cela publie `firestore.rules` et `storage.rules`, qui garantissent que
 chaque utilisateur ne peut lire/écrire que ses propres données.
 
-## 4. Activer l'assistant (chatbot)
+## 4. Activer l'assistant IA
 
 L'assistant tourne dans une Cloud Function (dossier `functions/`), pas dans
 le navigateur, car la clé API Anthropic doit rester secrète.
@@ -57,8 +57,9 @@ le navigateur, car la clé API Anthropic doit rester secrète.
    `https://europe-west1-VOTRE_PROJET.cloudfunctions.net/askAssistant`.
    Collez-la dans `firebase-config.js`, champ `window.CHAT_ENDPOINT`.
 
-Tant que ce champ est vide, le bouton d'assistant reste visible mais
-indique clairement qu'il n'est pas encore configuré.
+L'assistant est réservé aux utilisateurs connectés : cela protège votre clé
+API et évite qu'un tiers utilise votre quota. Il faut donc activer la
+connexion par lien e-mail à l'étape 1 avant de le tester.
 
 ## 5. Activer l'envoi automatique des PDF par e-mail (optionnel)
 
@@ -69,7 +70,9 @@ il ne reste qu'à joindre le fichier manuellement, car un site web ne peut
 pas joindre un fichier à votre place dans un `mailto:`.
 
 Pour un envoi 100 % automatique (sans ouvrir votre messagerie), déployez la
-fonction cloud `sendInvoiceEmail` :
+fonction cloud `sendInvoiceEmail`. Cet envoi est réservé aux utilisateurs
+connectés, afin que le serveur SMTP ne puisse jamais être utilisé comme une
+passerelle publique :
 
 1. Munissez-vous d'un compte e-mail dédié à l'envoi (Gmail fonctionne bien).
    Sur Gmail : activez la validation en deux étapes, puis créez un **mot de
