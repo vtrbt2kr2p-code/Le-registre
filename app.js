@@ -24,9 +24,9 @@ const ICONS = {
 /* ============================= TRANSLATIONS ============================= */
 const TRANSLATIONS = {
   fr: {
-    appName: 'Le Registre', appTagline: 'Gestion commerciale connectée',
+    appName: 'Le Registre', appTagline: 'Devis & factures · hors ligne',
     navDashboard: 'Tableau de bord', navClients: 'Clients', navArticles: 'Articles & services', navSettings: 'Mon entreprise', navPreferences: 'Réglages', navAdmin: 'Administration',
-    sidebarPrivacy: "Vos données sont sécurisées sur cet appareil et synchronisées dès votre connexion.",
+    sidebarPrivacy: "Vos données restent sur cet appareil (stockage privé du navigateur). Rien n'est envoyé à un serveur.",
     newQuoteBtn: 'Nouveau devis', loading: 'Chargement du registre…',
     guideBtn: "Guide d'utilisation (PDF)",
     legalLinkBtn: 'Mentions légales & CGU', legalTitle: 'Informations légales',
@@ -73,7 +73,7 @@ const TRANSLATIONS = {
     placeholderIban: 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
     placeholderFooter: 'Ex. TVA non applicable, art. 293 B du CGI',
     eyebrowQuote: 'Devis', eyebrowInvoice: 'Facture', establishedFrom: 'établie depuis',
-    backBtn: 'Retour', exportPdfBtn: 'Télécharger le PDF', emailPdfBtn: 'Envoyer par e-mail', convertBtn: 'Convertir en facture', deleteBtn: 'Supprimer',
+    backBtn: 'Retour', exportPdfBtn: 'Exporter en PDF', emailPdfBtn: 'Envoyer par e-mail', convertBtn: 'Convertir en facture', deleteBtn: 'Supprimer',
     sectionGeneral: 'Informations générales', fieldDocType: 'Type de document',
     typeQuote: 'Devis', typeInvoice: 'Facture', fieldDate: 'Date', fieldStatus: 'Statut',
     fieldConditions: 'Conditions de règlement', sectionClient: 'Client',
@@ -98,9 +98,9 @@ const TRANSLATIONS = {
     toastDocumentDeleted: 'Document supprimé', toastInvoiceFromQuote: 'Facture créée à partir du devis',
     toastClientDeleted: 'Client supprimé', toastArticleDeleted: 'Article supprimé',
     toastCompanySaved: 'Profil entreprise enregistré', toastClientSaved: 'Client enregistré',
-    toastArticleSaved: 'Article enregistré', toastPdfExported: 'PDF prêt',
+    toastArticleSaved: 'Article enregistré', toastPdfExported: 'PDF exporté',
     toastStorageError: 'Erreur de sauvegarde locale',
-    toastPdfLibLoading: "La génération de PDF n'est pas encore prête, réessayez dans un instant.",
+    toastPdfLibLoading: "Impossible de charger le générateur de PDF (vérifiez votre connexion Internet) et réessayez.",
     toastLogoError: "Impossible de lire cette image, essayez un autre fichier.",
     toastGuideGenerated: 'Guide PDF généré',
     toastPdfExportError: "L'export PDF a échoué. Réessayez, ou utilisez le bouton de partage de votre appareil.",
@@ -115,12 +115,12 @@ const TRANSLATIONS = {
     fieldValidity: "Validité de l'offre / échéance",
     pdfValidity: 'Valable jusqu’au',
     sectionBackup: 'Sauvegarde de vos données',
-    backupHint: "Vos données restent disponibles sur cet appareil et se synchronisent en ligne lorsque vous êtes connecté. Exportez aussi une sauvegarde (.json) pour disposer d'une copie indépendante.",
+    backupHint: "Comme l'application ne stocke rien sur un serveur, seul cet appareil connaît vos données. Exportez régulièrement une sauvegarde (fichier .json) — vous pouvez vous l'envoyer par e-mail ou la garder dans vos fichiers, puis la restaurer sur ce même appareil ou un autre.",
     backupBtn: 'Exporter une sauvegarde', restoreBtn: 'Restaurer une sauvegarde',
     toastBackupSaved: 'Sauvegarde créée', toastBackupRestored: 'Sauvegarde restaurée avec succès',
     toastBackupError: 'Ce fichier de sauvegarde est invalide ou illisible',
     restoreConfirm: 'Restaurer cette sauvegarde remplacera toutes les données actuelles sur cet appareil (clients, articles, devis, factures, entreprise). Continuer ?',
-    sectionAccount: 'Compte, synchronisation & services',
+    sectionAccount: 'Compte & synchronisation',
     sectionAdmin: 'Administration',
     adminClaimHint: "Si votre adresse e-mail est autorisée comme administrateur (voir SETUP-COMPTE-ET-ASSISTANT.md), activez ici l'accès au tableau de bord.",
     becomeAdminBtn: 'Devenir administrateur',
@@ -149,10 +149,9 @@ const TRANSLATIONS = {
     toastCloudNotConfigured: "La connexion n'est pas encore configurée sur cette application (voir SETUP-COMPTE-ET-ASSISTANT.md).",
     promptConfirmEmail: 'Merci de confirmer votre adresse e-mail pour terminer la connexion :',
     toastSyncPulled: 'Données synchronisées depuis le cloud',
-    chatTitle: 'Assistant IA',
-    chatIntro: "Votre assistant IA vous aide sur l'application, vos devis, vos factures et les bonnes pratiques de facturation.",
+    chatTitle: 'Assistant Le Registre',
+    chatIntro: "Posez une question sur l'utilisation de l'application, la création de devis/factures, ou la réglementation liée à la facturation. Je ne réponds qu'à ces sujets.",
     chatPlaceholder: 'Votre question…',
-    chatLoginRequired: 'Connectez-vous depuis « Réglages » pour utiliser l’assistant IA en toute sécurité.',
     chatNotConfigured: "L'assistant n'est pas encore configuré sur cette application. Voir SETUP-COMPTE-ET-ASSISTANT.md pour l'activer.",
     chatError: "Désolé, l'assistant est momentanément indisponible. Réessayez plus tard.",
     sectionSignature: 'Signature', signatureHint: 'Signez avec le doigt ou la souris directement dans le cadre ci-dessous. La signature est enregistrée avec le document.',
@@ -163,8 +162,8 @@ const TRANSLATIONS = {
     pdfUnitPriceHT: 'Prix unit. HT', pdfTotalHT: 'Total HT', pdfConditions: 'Conditions de règlement',
     pdfIban: 'IBAN', pdfYourCompany: 'Votre entreprise', pdfReference: 'Réf.', pdfUnit: 'Unité', pdfDiscount: 'Remise',
     pdfSignature: 'Signature',
-    onboardTitle: 'Bienvenue dans Le Registre', onboardIntro: 'Votre espace de gestion pour créer, envoyer et suivre vos devis et factures. Voici comment démarrer.',
-    onboardStep1Title: '1. Travaillez partout', onboardStep1Body: "Connectez-vous pour synchroniser vos données sur vos appareils. Une copie locale reste disponible sur cet appareil.",
+    onboardTitle: 'Bienvenue dans Le Registre', onboardIntro: 'Un générateur de devis et factures qui fonctionne entièrement hors ligne. Voici comment démarrer.',
+    onboardStep1Title: '1. Vos données restent ici', onboardStep1Body: "Tout est enregistré sur cet appareil, dans votre navigateur. Rien n'est envoyé à un serveur.",
     onboardStep2Title: '2. Créez un devis', onboardStep2Body: "Bouton « Nouveau devis », choisissez un client, ajoutez vos lignes de prestation détaillées : les totaux HT/TVA/TTC se calculent tout seuls.",
     onboardStep3Title: '3. Convertissez en facture', onboardStep3Body: "Une fois le devis accepté, un bouton permet de le transformer en facture en un clic.",
     onboardStep4Title: '4. Exportez en PDF', onboardStep4Body: "Depuis chaque devis ou facture, exportez un PDF prêt à envoyer, avec le logo de votre entreprise et votre signature manuscrite.",
@@ -193,9 +192,9 @@ const TRANSLATIONS = {
     ],
   },
   en: {
-    appName: 'The Registry', appTagline: 'Connected business management',
+    appName: 'The Registry', appTagline: 'Quotes & invoices · offline',
     navDashboard: 'Dashboard', navClients: 'Clients', navArticles: 'Products & services', navSettings: 'My business', navPreferences: 'Settings', navAdmin: 'Admin',
-    sidebarPrivacy: 'Your data is secured on this device and syncs when you sign in.',
+    sidebarPrivacy: "Your data stays on this device (private browser storage). Nothing is sent to a server.",
     newQuoteBtn: 'New quote', loading: 'Loading the registry…',
     guideBtn: 'User guide (PDF)',
     legalLinkBtn: 'Legal & terms', legalTitle: 'Legal information',
@@ -242,7 +241,7 @@ const TRANSLATIONS = {
     placeholderIban: 'FR76 XXXX XXXX XXXX XXXX XXXX XXX',
     placeholderFooter: 'e.g. VAT not applicable, art. 293 B of the French Tax Code',
     eyebrowQuote: 'Quote', eyebrowInvoice: 'Invoice', establishedFrom: 'created from',
-    backBtn: 'Back', exportPdfBtn: 'Download PDF', emailPdfBtn: 'Send by email', convertBtn: 'Convert to invoice', deleteBtn: 'Delete',
+    backBtn: 'Back', exportPdfBtn: 'Export to PDF', emailPdfBtn: 'Send by email', convertBtn: 'Convert to invoice', deleteBtn: 'Delete',
     sectionGeneral: 'General information', fieldDocType: 'Document type',
     typeQuote: 'Quote', typeInvoice: 'Invoice', fieldDate: 'Date', fieldStatus: 'Status',
     fieldConditions: 'Payment terms', sectionClient: 'Client',
@@ -267,9 +266,9 @@ const TRANSLATIONS = {
     toastDocumentDeleted: 'Document deleted', toastInvoiceFromQuote: 'Invoice created from quote',
     toastClientDeleted: 'Client deleted', toastArticleDeleted: 'Item deleted',
     toastCompanySaved: 'Business profile saved', toastClientSaved: 'Client saved',
-    toastArticleSaved: 'Item saved', toastPdfExported: 'PDF ready',
+    toastArticleSaved: 'Item saved', toastPdfExported: 'PDF exported',
     toastStorageError: 'Local save error',
-    toastPdfLibLoading: "PDF generation isn't ready yet, try again in a moment.",
+    toastPdfLibLoading: "Couldn't load the PDF generator (check your internet connection) and try again.",
     toastLogoError: "Couldn't read this image, please try another file.",
     toastGuideGenerated: 'Guide PDF generated',
     toastPdfExportError: "The PDF export failed. Try again, or use your device's share button.",
@@ -284,12 +283,12 @@ const TRANSLATIONS = {
     fieldValidity: 'Quote validity / due date',
     pdfValidity: 'Valid until',
     sectionBackup: 'Data backup',
-    backupHint: 'Your data stays available on this device and syncs online when you are signed in. Export a backup (.json file) too, for an independent copy.',
+    backupHint: "Since the app doesn't store anything on a server, only this device knows your data. Export a backup (.json file) regularly — you can email it to yourself or keep it in your files, then restore it on this device or another one.",
     backupBtn: 'Export a backup', restoreBtn: 'Restore a backup',
     toastBackupSaved: 'Backup created', toastBackupRestored: 'Backup restored successfully',
     toastBackupError: 'This backup file is invalid or unreadable',
     restoreConfirm: 'Restoring this backup will replace all current data on this device (clients, items, quotes, invoices, business profile). Continue?',
-    sectionAccount: 'Account, sync & services',
+    sectionAccount: 'Account & sync',
     sectionAdmin: 'Admin',
     adminClaimHint: "If your email is authorized as an administrator (see SETUP-COMPTE-ET-ASSISTANT.md), enable dashboard access here.",
     becomeAdminBtn: 'Become administrator',
@@ -318,10 +317,9 @@ const TRANSLATIONS = {
     toastCloudNotConfigured: 'Sign-in is not configured yet on this app (see SETUP-COMPTE-ET-ASSISTANT.md).',
     promptConfirmEmail: 'Please confirm your email address to finish signing in:',
     toastSyncPulled: 'Data synced from the cloud',
-    chatTitle: 'AI Assistant',
-    chatIntro: 'Your AI assistant can help with the app, quotes, invoices and invoicing best practices.',
+    chatTitle: 'The Registry Assistant',
+    chatIntro: 'Ask a question about using the app, creating quotes/invoices, or invoicing regulations. I only answer these topics.',
     chatPlaceholder: 'Your question…',
-    chatLoginRequired: 'Sign in from "Settings" to use the AI assistant securely.',
     chatNotConfigured: 'The assistant is not configured yet on this app. See SETUP-COMPTE-ET-ASSISTANT.md to enable it.',
     chatError: 'Sorry, the assistant is temporarily unavailable. Try again later.',
     sectionSignature: 'Signature', signatureHint: 'Sign with your finger or mouse directly in the box below. The signature is saved with the document.',
@@ -332,8 +330,8 @@ const TRANSLATIONS = {
     pdfUnitPriceHT: 'Unit price', pdfTotalHT: 'Total excl. VAT', pdfConditions: 'Payment terms',
     pdfIban: 'IBAN', pdfYourCompany: 'Your business', pdfReference: 'Ref.', pdfUnit: 'Unit', pdfDiscount: 'Discount',
     pdfSignature: 'Signature',
-    onboardTitle: 'Welcome to The Registry', onboardIntro: 'Your workspace to create, send and manage quotes and invoices. Here is how to get started.',
-    onboardStep1Title: '1. Work everywhere', onboardStep1Body: 'Sign in to sync your data between devices. A local copy stays available on this device.',
+    onboardTitle: 'Welcome to The Registry', onboardIntro: 'A quote and invoice generator that works entirely offline. Here\'s how to get started.',
+    onboardStep1Title: '1. Your data stays here', onboardStep1Body: 'Everything is saved on this device, in your browser. Nothing is sent to a server.',
     onboardStep2Title: '2. Create a quote', onboardStep2Body: 'Tap "New quote", pick a client, add your detailed line items: subtotal, VAT and total are calculated automatically.',
     onboardStep3Title: '3. Convert it to an invoice', onboardStep3Body: 'Once a quote is accepted, one button turns it into an invoice.',
     onboardStep4Title: '4. Export to PDF', onboardStep4Body: 'From any quote or invoice, export a ready-to-send PDF with your company logo and your handwritten signature.',
@@ -518,22 +516,12 @@ async function loadAll(){
     const [c,a,d,e,p,ob] = await Promise.all([
       safeGet('clients'), safeGet('articles'), safeGet('documents'), safeGet('entreprise'), safeGet('preferences'), safeGet('onboarding_seen')
     ]);
-    const parse = (value, fallback) => {
-      try { return value ? JSON.parse(value) : fallback; }
-      catch(_) { return fallback; }
-    };
-    const clients = parse(c, []);
-    const articles = parse(a, []);
-    const documents = parse(d, []);
-    const entreprise = parse(e, null);
-    const prefs = parse(p, null);
-    state.clients = Array.isArray(clients) ? clients : [];
-    state.articles = Array.isArray(articles) ? articles : [];
-    state.documents = Array.isArray(documents) ? documents : [];
-    if(entreprise && typeof entreprise === 'object' && !Array.isArray(entreprise)){
-      state.entreprise = Object.assign({nom:'',adresse:'',siret:'',tva:'',iban:'',pied:'',logo:'',devise:'EUR',police:''}, entreprise);
-    }
-    if(prefs && typeof prefs === 'object' && !Array.isArray(prefs)){
+    state.clients = c ? JSON.parse(c) : [];
+    state.articles = a ? JSON.parse(a) : [];
+    state.documents = d ? JSON.parse(d) : [];
+    state.entreprise = e ? Object.assign({nom:'',adresse:'',siret:'',tva:'',iban:'',pied:'',logo:'',devise:'EUR',police:''}, JSON.parse(e)) : state.entreprise;
+    if(p){
+      const prefs = JSON.parse(p);
       state.lang = prefs.lang === 'en' ? 'en' : 'fr';
       state.theme = prefs.theme === 'sombre' ? 'sombre' : 'clair';
       state.fontSize = ['petit','moyen','grand'].includes(prefs.fontSize) ? prefs.fontSize : 'moyen';
@@ -666,12 +654,6 @@ async function becomeAdmin(){
       method: 'POST',
       headers: {Authorization: `Bearer ${idToken}`}
     });
-    if(res.status === 403){
-      // L'adresse connectée n'est pas dans la liste blanche : inutile de
-      // présenter cette erreur attendue comme un problème technique.
-      toast(t('toastAdminForbidden'));
-      return;
-    }
     if(!res.ok){
       const data = await res.json().catch(()=>({}));
       throw new Error(data.error || `HTTP ${res.status}`);
@@ -783,7 +765,7 @@ async function importBackupFile(file){
   try{
     const text = await file.text();
     const data = JSON.parse(text);
-    if(!data || typeof data !== 'object' || !Array.isArray(data.clients) || !Array.isArray(data.articles) || !Array.isArray(data.documents)){
+    if(!data || typeof data !== 'object' || !Array.isArray(data.clients) || !Array.isArray(data.documents)){
       throw new Error('format invalide');
     }
     if(!confirm(t('restoreConfirm'))) return;
@@ -1313,7 +1295,7 @@ function renderReglages(){
     <div class="card" style="padding:24px;max-width:560px;margin-top:16px;">
       <div class="section-title" style="border:none;padding:0;margin-bottom:10px;">${t('sectionAccount')}</div>
       ${renderAccountBlock()}
-      ${(cloudUser && !state.isAdmin) ? `
+      ${(cloudUser && !state.isAdmin && window.ADMIN_GRANT_ENDPOINT) ? `
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--rule);">
           <p class="hint" style="margin-bottom:10px;">${t('adminClaimHint')}</p>
           <button class="btn secondary" data-action="become-admin">${ICONS.gear} ${t('becomeAdminBtn')}</button>
@@ -1730,17 +1712,10 @@ async function askAssistant(question){
     render();
     return;
   }
-  if(!fbCurrentUser){
-    state.chatMessages.push({role:'assistant', content:t('chatLoginRequired')});
-    state.chatLoading = false;
-    render();
-    return;
-  }
   try{
-    const idToken = await fbCurrentUser.getIdToken();
     const res = await fetch(window.CHAT_ENDPOINT, {
       method:'POST',
-      headers:{'Content-Type':'application/json', Authorization:`Bearer ${idToken}`},
+      headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ question, lang: state.lang })
     });
     if(!res.ok) throw new Error('réponse serveur invalide');
@@ -2172,6 +2147,24 @@ async function deliverPdf(pdf, filename){
 }
 
 /* ============================= PDF EXPORT ============================= */
+// Sur une connexion lente ou juste après l'ouverture de la page, la
+// bibliothèque jsPDF (chargée depuis un CDN, voir index.html) peut ne pas
+// encore être prête au moment où l'utilisateur clique sur un bouton PDF.
+// Plutôt que d'échouer immédiatement, on patiente jusqu'à 6 secondes en
+// vérifiant toutes les 200ms — largement suffisant même sur un réseau lent,
+// et ça évite le message d'erreur prématuré "PDF pas encore prêt".
+function waitForJsPDF(timeoutMs){
+  timeoutMs = timeoutMs || 6000;
+  return new Promise((resolve)=>{
+    const ready = () => window.jspdf && window.jspdf.jsPDF;
+    if(ready()) { resolve(true); return; }
+    const start = Date.now();
+    const interval = setInterval(()=>{
+      if(ready()){ clearInterval(interval); resolve(true); }
+      else if(Date.now() - start > timeoutMs){ clearInterval(interval); resolve(false); }
+    }, 200);
+  });
+}
 // buildDocPdf() construit l'objet jsPDF du devis/facture sans le livrer
 // (téléchargement/partage), afin d'être réutilisé à la fois par l'export
 // classique (exportDocPdf) et par l'envoi par e-mail (emailDocPdf).
@@ -2313,7 +2306,7 @@ async function buildDocPdf(doc){
 }
 
 async function exportDocPdf(doc){
-  if(!window.jspdf || !window.jspdf.jsPDF){ toast(t('toastPdfLibLoading')); return; }
+  if(!(await waitForJsPDF())){ toast(t('toastPdfLibLoading')); return; }
   persistDoc(doc, {silent:true});
   try{
     const pdf = await buildDocPdf(doc);
@@ -2337,7 +2330,7 @@ async function exportDocPdf(doc){
 // configurée un jour (window.EMAIL_ENDPOINT), on pourra basculer vers un
 // envoi 100% automatique sans changer l'appel depuis l'interface.
 async function emailDocPdf(doc){
-  if(!window.jspdf || !window.jspdf.jsPDF){ toast(t('toastPdfLibLoading')); return; }
+  if(!(await waitForJsPDF())){ toast(t('toastPdfLibLoading')); return; }
   persistDoc(doc, {silent:true});
   try{
     const pdf = await buildDocPdf(doc);
@@ -2349,16 +2342,15 @@ async function emailDocPdf(doc){
     const subject = (isQuote ? t('emailPdfSubjectQuote') : t('emailPdfSubjectInvoice'))(doc.numero);
     const body = (isQuote ? t('emailPdfBodyQuote') : t('emailPdfBodyInvoice'))(doc.numero, e && e.nom);
 
-    if(window.EMAIL_ENDPOINT && fbCurrentUser){
+    if(window.EMAIL_ENDPOINT){
       // Envoi automatique via une Cloud Function (si configurée, voir
       // SETUP-COMPTE-ET-ASSISTANT.md). Le PDF est envoyé en pièce jointe
       // sans que l'utilisateur ait à ouvrir sa messagerie.
       if(!client || !client.email){ toast(t('toastEmailNoClientAddress')); return; }
       const pdfBase64 = pdf.output('datauristring').split(',')[1];
-      const idToken = await fbCurrentUser.getIdToken();
       const res = await fetch(window.EMAIL_ENDPOINT, {
         method: 'POST',
-        headers: {'Content-Type':'application/json', Authorization:`Bearer ${idToken}`},
+        headers: {'Content-Type':'application/json'},
         body: JSON.stringify({to: client.email, subject, message: body, filename, pdfBase64})
       });
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2383,7 +2375,7 @@ async function emailDocPdf(doc){
 // Génère, entièrement hors ligne, un guide PDF expliquant le fonctionnement
 // de l'application dans la langue active, pour guider l'utilisateur au bon usage.
 async function generateGuidePdf(){
-  if(!window.jspdf || !window.jspdf.jsPDF){ toast(t('toastPdfLibLoading')); return; }
+  if(!(await waitForJsPDF())){ toast(t('toastPdfLibLoading')); return; }
   try{
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({unit:'pt', format:'a4'});
@@ -2428,7 +2420,4 @@ async function generateGuidePdf(){
 /* ============================= INIT ============================= */
 window.addEventListener('error', (e)=>{ console.error('Erreur non interceptée :', e.error || e.message); });
 window.addEventListener('unhandledrejection', (e)=>{ console.error('Promesse rejetée :', e.reason); });
-loadAll();
-// Les SDK Firebase sont chargés avec `defer` dans index.html. Attendre `load`
-// évite de rater la synchronisation si la connexion est lente au premier accès.
-window.addEventListener('load', initCloud, {once:true});
+loadAll().then(initCloud);
