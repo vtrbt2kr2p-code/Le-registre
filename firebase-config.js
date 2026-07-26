@@ -7,7 +7,7 @@ window.FIREBASE_CONFIG = {
   appId: "1:4031686246:web:87bfc51067b8adca236fa7"
 };
 
-window.CHAT_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/askAssistant";
-window.EMAIL_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/sendInvoiceEmail";
-window.ADMIN_GRANT_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/grantAdmin";
-window.ADMIN_STATS_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/getAdminStats";
+window.CHAT_ENDPOINT = "https://askassistant-mrpwp76nfq-ew.a.run.app";
+window.EMAIL_ENDPOINT = "https://sendinvoiceemail-mrpwp76nfq-ew.a.run.app";
+window.ADMIN_GRANT_ENDPOINT = "https://grantadmin-mrpwp76nfq-ew.a.run.app";
+window.ADMIN_STATS_ENDPOINT = "https://getadminstats-mrpwp76nfq-ew.a.run.app";
