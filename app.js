@@ -49,20 +49,13 @@ function fontCssFor(id){
 }
 
 /* ============================= COMPTE UTILISATEUR (Firebase) =============================
-   Pour activer les comptes (inscription/connexion) et la synchronisation entre
-   appareils : crée un projet gratuit sur https://console.firebase.google.com,
-   puis remplace les 6 valeurs ci-dessous par celles de ton projet
-   (Paramètres du projet > Vos applications > configuration Web).
-   Tant que apiKey commence par "REMPLACER", l'application fonctionne exactement
-   comme avant : 100% locale, sans compte, sans connexion internet requise. */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBKQPSgXv-oh2RR8cmydRlUrS-USGLEjnY",
-  authDomain: "le-registre-1d9d5.firebaseapp.com",
-  projectId: "le-registre-1d9d5",
-  storageBucket: "le-registre-1d9d5.firebasestorage.app",
-  messagingSenderId: "475202666385",
-  appId: "1:475202666385:web:dea97c43b2164907f0a430"
-};
+   La configuration Firebase vient maintenant d'un seul endroit : le fichier
+   firebase-config.js (chargé avant celui-ci), qui définit window.FIREBASE_CONFIG.
+   C'est LE SEUL fichier à modifier si tu changes de projet Firebase un jour.
+   Tant que window.FIREBASE_CONFIG n'existe pas (ou que apiKey est vide),
+   l'application fonctionne exactement comme avant : 100% locale, sans compte,
+   sans connexion internet requise. */
+const FIREBASE_CONFIG = window.FIREBASE_CONFIG || { apiKey: '' };
 const FIREBASE_ENABLED = !!(FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('REMPLACER'));
 
 /* ============================= TRANSLATIONS ============================= */
@@ -112,7 +105,11 @@ const TRANSLATIONS = {
     logoHint: "Image JPG ou PNG depuis votre téléphone ou votre ordinateur. Une image carrée donne le meilleur résultat.",
     logoPlaceholder: 'Logo',
     eyebrowQuote: 'Devis', eyebrowInvoice: 'Facture', establishedFrom: 'établie depuis',
-    backBtn: 'Retour', exportPdfBtn: 'Exporter en PDF', convertBtn: 'Convertir en facture', deleteBtn: 'Supprimer',
+    backBtn: 'Retour', exportPdfBtn: 'Exporter en PDF', sendEmailBtn: 'Envoyer par e-mail', convertBtn: 'Convertir en facture', deleteBtn: 'Supprimer',
+    toastEmailNoAddress: "Ce client n'a pas d'adresse e-mail : ajoutez-en une dans sa fiche, ou saisissez-la dans votre messagerie.",
+    emailSubjectQuote: 'Devis', emailSubjectInvoice: 'Facture',
+    emailBodyQuote: "Bonjour,\n\nVeuillez trouver ci-joint le devis {numero}.\nLe PDF vient d'être téléchargé sur votre appareil : merci de le joindre à cet e-mail avant l'envoi.\n\nCordialement,\n{entreprise}",
+    emailBodyInvoice: "Bonjour,\n\nVeuillez trouver ci-jointe la facture {numero}.\nLe PDF vient d'être téléchargé sur votre appareil : merci de le joindre à cet e-mail avant l'envoi.\n\nCordialement,\n{entreprise}",
     saveDocBtn: 'Enregistrer',
     sectionGeneral: 'Informations générales', fieldDocType: 'Type de document',
     typeQuote: 'Devis', typeInvoice: 'Facture', fieldDate: 'Date', fieldStatus: 'Statut',
@@ -222,7 +219,11 @@ const TRANSLATIONS = {
     logoHint: 'JPG or PNG image from your phone or computer. A square image works best.',
     logoPlaceholder: 'Logo',
     eyebrowQuote: 'Quote', eyebrowInvoice: 'Invoice', establishedFrom: 'created from',
-    backBtn: 'Back', exportPdfBtn: 'Export to PDF', convertBtn: 'Convert to invoice', deleteBtn: 'Delete',
+    backBtn: 'Back', exportPdfBtn: 'Export to PDF', sendEmailBtn: 'Send by email', convertBtn: 'Convert to invoice', deleteBtn: 'Delete',
+    toastEmailNoAddress: "This client has no email address: add one on their record, or type it in your mail app.",
+    emailSubjectQuote: 'Quote', emailSubjectInvoice: 'Invoice',
+    emailBodyQuote: "Hello,\n\nPlease find attached quote {numero}.\nThe PDF was just downloaded to your device: please attach it to this email before sending.\n\nBest regards,\n{entreprise}",
+    emailBodyInvoice: "Hello,\n\nPlease find attached invoice {numero}.\nThe PDF was just downloaded to your device: please attach it to this email before sending.\n\nBest regards,\n{entreprise}",
     saveDocBtn: 'Save',
     sectionGeneral: 'General information', fieldDocType: 'Document type',
     typeQuote: 'Quote', typeInvoice: 'Invoice', fieldDate: 'Date', fieldStatus: 'Status',
@@ -1112,6 +1113,7 @@ function renderEditor(){
         <button class="btn secondary" data-action="back">← ${t('backBtn')}</button>
         <button class="btn secondary" data-action="save-doc">${t('saveDocBtn')}</button>
         <button class="btn secondary" data-action="export-pdf">${ICONS.pdf} ${t('exportPdfBtn')}</button>
+        <button class="btn secondary" data-action="send-email">${ICONS.upload} ${t('sendEmailBtn')}</button>
         ${doc.type==='devis' ? `<button class="btn stamp" data-action="to-facture">${ICONS.copy} ${t('convertBtn')}</button>` : ''}
         <button class="btn danger" data-action="delete-doc">${ICONS.trash} ${t('deleteBtn')}</button>
       </div>
@@ -1505,6 +1507,8 @@ function bindEditorEvents(app){
 
   const exportBtn = app.querySelector('[data-action="export-pdf"]');
   if(exportBtn) exportBtn.onclick = ()=> exportDocPdf(doc);
+  const emailBtn = app.querySelector('[data-action="send-email"]');
+  if(emailBtn) emailBtn.onclick = ()=> sendDocByEmail(doc);
 
   const toFactureBtn = app.querySelector('[data-action="to-facture"]');
   if(toFactureBtn) toFactureBtn.onclick = ()=> convertToFacture(doc);
@@ -1744,6 +1748,35 @@ function exportDocPdf(doc){
 
   pdf.save(`${doc.numero}.pdf`);
   toast(t('toastPdfExported'));
+}
+
+/* ============================= ENVOI PAR E-MAIL (mailto) =============================
+   Aucun serveur n'est requis : le PDF est d'abord téléchargé sur l'appareil
+   (comme pour "Exporter en PDF"), puis la messagerie par défaut de
+   l'utilisateur s'ouvre avec le destinataire, l'objet et le message déjà
+   remplis. Un site web statique ne peut pas joindre automatiquement un
+   fichier à un e-mail (limitation du lien mailto:) : il reste à glisser le
+   PDF téléchargé dans l'e-mail avant de l'envoyer. Pour un envoi 100%
+   automatique (pièce jointe incluse, sans ouvrir la messagerie), il faudrait
+   une fonction serveur (voir SETUP-COMPTE-ET-ASSISTANT.md, section 5). */
+function sendDocByEmail(doc){
+  exportDocPdf(doc); // télécharge le PDF, comme le bouton "Exporter en PDF"
+
+  const client = state.clients.find(c=>c.id===doc.clientId) || doc.clientSnapshot;
+  const to = (client && client.email) ? client.email : '';
+  if(!to) toast(t('toastEmailNoAddress'));
+
+  const isQuote = doc.type === 'devis';
+  const subject = `${isQuote ? t('emailSubjectQuote') : t('emailSubjectInvoice')} ${doc.numero}`;
+  const bodyTemplate = isQuote ? t('emailBodyQuote') : t('emailBodyInvoice');
+  const body = bodyTemplate
+    .replace('{numero}', doc.numero)
+    .replace('{entreprise}', state.entreprise.nom || '');
+
+  const mailtoUrl = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  // Laisse un court délai pour que le téléchargement du PDF se déclenche
+  // avant que le navigateur ne change de contexte vers l'application mail.
+  setTimeout(()=>{ window.location.href = mailtoUrl; }, 300);
 }
 
 /* ============================= GUIDE D'UTILISATION (PDF) ============================= */

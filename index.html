@@ -31,8 +31,13 @@
 <div id="toast" class="toast"></div>
 
 <!-- Stockage local (IndexedDB) : doit être chargé avant app.js -->
-<script src="idb-shim.js"></script>
-<script src="app.js"></script>
+<!-- defer (au lieu d'un chargement immédiat) est indispensable ici : cela garantit
+     que ces deux scripts s'exécutent APRÈS les scripts Firebase ci-dessus (eux
+     aussi en defer), qui doivent avoir fini de charger window.firebase avant que
+     app.js n'appelle boot(). Sans ça, la connexion/inscription échoue de façon
+     aléatoire selon la vitesse de chargement du réseau. -->
+<script src="idb-shim.js" defer></script>
+<script src="app.js" defer></script>
 
 <script>
   if ('serviceWorker' in navigator) {
