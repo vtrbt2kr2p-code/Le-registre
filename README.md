@@ -24,7 +24,7 @@ en quelques minutes.
 ├── firebase-config.js       → clés Firebase (facultatif, voir SETUP-COMPTE-ET-ASSISTANT.md)
 ├── firestore.rules / storage.rules → règles de sécurité (isolation par utilisateur)
 ├── firebase.json / .firebaserc → config CLI Firebase (fonctions + règles uniquement)
-├── functions/                → Cloud Function de l'assistant (index.js, package.json)
+├── functions/                → fonctions sécurisées (IA, e-mail, statistiques)
 ├── SETUP-COMPTE-ET-ASSISTANT.md → activer connexion par e-mail + assistant
 ├── LICENSE                  → licence MIT
 └── .gitignore

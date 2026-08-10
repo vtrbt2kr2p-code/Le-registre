@@ -14,7 +14,7 @@
  */
 // Augmenté lors d'une mise à jour de l'interface afin que les installations
 // existantes récupèrent aussi les nouveaux menus et le tutoriel hors ligne.
-const CACHE_NAME = 'registre-cache-v6';
+const CACHE_NAME = 'registre-cache-v7';
 
 const APP_SHELL = [
   './',

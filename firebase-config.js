@@ -12,12 +12,10 @@ window.FIREBASE_CONFIG = {
   measurementId: "G-3FW1R6Z2ZM"
 };
 
-// Ces 4 lignes correspondent à des Cloud Functions. Ces URLs étaient déjà
-// présentes dans le fichier d'origine — il est possible qu'elles aient été
-// déployées à un moment donné, mais app.js ne les appelle actuellement nulle
-// part (aucune fonctionnalité ne les utilise pour l'instant). À vérifier avec
-// Pelé avant de les activer côté frontend — voir SETUP-COMPTE-ET-ASSISTANT.md.
-window.CHAT_ENDPOINT = "https://askassistant-mrpwp76nfq-ew.a.run.app";
-window.EMAIL_ENDPOINT = "https://sendinvoiceemail-mrpwp76nfq-ew.a.run.app";
-window.ADMIN_GRANT_ENDPOINT = "https://grantadmin-mrpwp76nfq-ew.a.run.app";
-window.ADMIN_STATS_ENDPOINT = "https://getadminstats-mrpwp76nfq-ew.a.run.app";
+// Endpoints des Cloud Functions déployées dans le projet Firebase le-registre1.
+// Ils restent configurés ici afin que GitHub Pages puisse appeler le backend
+// sans exposer de clé IA ou de mot de passe SMTP dans le navigateur.
+window.CHAT_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/askAssistant";
+window.EMAIL_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/sendInvoiceEmail";
+window.ADMIN_GRANT_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/grantAdmin";
+window.ADMIN_STATS_ENDPOINT = "https://europe-west1-le-registre1.cloudfunctions.net/getAdminStats";

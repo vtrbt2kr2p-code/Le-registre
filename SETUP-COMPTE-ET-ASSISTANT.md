@@ -8,8 +8,7 @@ sur chaque appareil pour préserver l'accès aux documents.
 
 1. Allez sur https://console.firebase.google.com et créez un projet
    (gratuit, aucune carte bancaire nécessaire à ce stade).
-2. **Authentication** → Sign-in method → activez « E-mail/Lien » (connexion
-   sans mot de passe, par lien envoyé par e-mail).
+2. **Authentication** → Sign-in method → activez « E-mail/Mot de passe ». Le bouton « Mot de passe oublié ? » de l'application utilise ensuite le flux officiel Firebase de réinitialisation.
 3. **Firestore Database** → Créer une base, en mode production.
 4. **Storage** → Commencer, en mode production.
 5. **Paramètres du projet** (⚙️) → Vos applications → Ajouter une application
@@ -143,3 +142,37 @@ Le site lui-même **reste hébergé sur GitHub Pages**, inchangé. Firebase
 n'est utilisé ici que pour trois choses : l'authentification, la base
 Firestore (sync multi-appareils) et la Cloud Function de l'assistant.
 Aucune de ces étapes ne modifie l'hébergement du site.
+
+
+## 7. Déploiement complet des fonctions
+
+Depuis la racine du projet :
+
+```bash
+firebase login
+firebase use le-registre1
+cd functions
+npm install
+cd ..
+firebase deploy --only functions,firestore:rules,storage:rules
+```
+
+Puis configurez les secrets nécessaires :
+
+```bash
+firebase functions:secrets:set ANTHROPIC_API_KEY
+firebase functions:secrets:set SMTP_HOST
+firebase functions:secrets:set SMTP_USER
+firebase functions:secrets:set SMTP_PASS
+firebase functions:secrets:set ADMIN_EMAIL
+```
+
+Les secrets ne doivent jamais être placés dans `app.js`, `index.html` ou `firebase-config.js`.
+
+### Isolation des données
+
+Les documents applicatifs sont sous `users/{uid}/store/...`. Les règles Firestore n'autorisent qu'un utilisateur à lire/écrire son propre UID. Le tableau de bord administrateur ne lit pas ces documents : il utilise uniquement Firebase Authentication et des compteurs agrégés. Le concepteur n'a donc pas un accès applicatif aux devis/factures privés.
+
+### Important
+
+GitHub Pages héberge le frontend. Firebase fournit uniquement l'authentification, la synchronisation et les fonctions serveur sécurisées. Les deux services sont complémentaires ; il n'est pas nécessaire de déplacer le frontend hors de GitHub Pages.

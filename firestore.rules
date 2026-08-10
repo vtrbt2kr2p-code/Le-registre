@@ -4,14 +4,14 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Un utilisateur ne peut lire/écrire QUE ses propres données.
-    // Toute l'app est structurée sous utilisateurs/{uid} précisément pour
+    // Toute l'app est structurée sous users/{uid} précisément pour
     // que cette unique règle protège tout : entreprise, devis, factures,
     // clients (voir app.js, fonctions pushToCloud/pullFromCloud). Même
     // l'auteur de l'app n'a AUCUN accès ici — il n'existe aucune règle
     // "admin" qui donnerait accès aux documents privés (voir le tableau de
     // bord admin, section "statistiques_globales" ci-dessous, qui ne lit
     // que des compteurs agrégés séparés, jamais ces documents).
-    match /utilisateurs/{userId}/{document=**} {
+    match /users/{userId}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 

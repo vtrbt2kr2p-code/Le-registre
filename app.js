@@ -61,7 +61,7 @@ const FIREBASE_ENABLED = !!(FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.st
 /* ============================= TRANSLATIONS ============================= */
 const TRANSLATIONS = {
   fr: {
-    appName: 'Le Registre', appTagline: 'Devis & factures · hors ligne',
+    appName: 'Le Registre', appTagline: 'Devis & factures · hors ligne', navAssistant: 'Assistant IA', assistantTitle: 'Assistant IA', assistantSubtitle: 'Un copilote pour vos clients, devis et factures.', assistantPlaceholder: 'Ex. Prépare un résumé de mon activité ce mois-ci…', assistantSend: 'Envoyer', assistantPrivacy: 'Les données envoyées à l’assistant sont utilisées uniquement pour répondre à votre demande. Ne partagez jamais de mot de passe ou de secret.', assistantUnavailable: 'L’assistant IA n’est pas encore activé côté serveur.', assistantError: 'Impossible de contacter l’assistant pour le moment.',
     navDashboard: 'Tableau de bord', navClients: 'Clients', navArticles: 'Articles & services', navSettings: 'Mon entreprise', navAbout: 'À propos', navPreferences: 'Réglages',
     sidebarPrivacy: "Vos données restent sur cet appareil (stockage privé du navigateur). Rien n'est envoyé à un serveur.",
     newQuoteBtn: 'Nouveau devis', loading: 'Chargement du registre…',
@@ -153,7 +153,7 @@ const TRANSLATIONS = {
     authLoginSubtitle: 'Connectez-vous à votre compte', authSignupSubtitle: 'Créez votre compte',
     authEmailLabel: 'Adresse e-mail', authPasswordLabel: 'Mot de passe',
     authLoginBtn: 'Se connecter', authSignupBtn: "S'inscrire", authLogoutBtn: 'Se déconnecter',
-    authHaveAccount: 'Déjà un compte ?', authNoAccount: 'Pas encore de compte ?',
+    authHaveAccount: 'Déjà un compte ?', authNoAccount: 'Pas encore de compte ?', authForgotPassword: 'Mot de passe oublié ?', authResetSent: 'Un e-mail de réinitialisation vient d’être envoyé.', authResetInvalid: 'Saisissez votre adresse e-mail pour recevoir le lien de réinitialisation.',
     authPrivacyHint: "Vos documents restent liés à votre compte et accessibles depuis n'importe quel appareil connecté avec ce même e-mail.",
     toastWelcomeSetup: 'Bienvenue ! Complétez les informations de votre entreprise.',
     toastSignedOut: 'Déconnecté',
@@ -175,7 +175,7 @@ const TRANSLATIONS = {
     onboardCta: 'Commencer',
   },
   en: {
-    appName: 'The Registry', appTagline: 'Quotes & invoices · offline',
+    appName: 'The Registry', appTagline: 'Quotes & invoices · offline', navAssistant: 'AI assistant', assistantTitle: 'AI assistant', assistantSubtitle: 'A copilot for your clients, quotes and invoices.', assistantPlaceholder: 'e.g. Summarize my activity this month…', assistantSend: 'Send', assistantPrivacy: 'Data sent to the assistant is used only to answer your request. Never share a password or secret.', assistantUnavailable: 'The AI assistant is not enabled on the server yet.', assistantError: 'The assistant could not be reached right now.',
     navDashboard: 'Dashboard', navClients: 'Clients', navArticles: 'Products & services', navSettings: 'My business', navAbout: 'About', navPreferences: 'Settings',
     sidebarPrivacy: "Your data stays on this device (private browser storage). Nothing is sent to a server.",
     newQuoteBtn: 'New quote', loading: 'Loading the registry…',
@@ -267,7 +267,7 @@ const TRANSLATIONS = {
     authLoginSubtitle: 'Sign in to your account', authSignupSubtitle: 'Create your account',
     authEmailLabel: 'Email address', authPasswordLabel: 'Password',
     authLoginBtn: 'Sign in', authSignupBtn: 'Sign up', authLogoutBtn: 'Sign out',
-    authHaveAccount: 'Already have an account?', authNoAccount: "Don't have an account?",
+    authHaveAccount: 'Already have an account?', authNoAccount: "Don't have an account?", authForgotPassword: 'Forgot password?', authResetSent: 'A password reset email has been sent.', authResetInvalid: 'Enter your email address to receive the reset link.',
     authPrivacyHint: 'Your documents stay linked to your account and are reachable from any device signed in with the same email.',
     toastWelcomeSetup: 'Welcome! Please fill in your business information.',
     toastSignedOut: 'Signed out',
@@ -339,16 +339,26 @@ function applyTheme(){
 }
 
 /* ============================= STORAGE ============================= */
+function storageKey(key){
+  // Quand les comptes Firebase sont actifs, chaque compte possède son propre
+  // espace IndexedDB. Cela évite qu'un second utilisateur sur le même appareil
+  // récupère ou republie les données locales du précédent compte.
+  return (FIREBASE_ENABLED && state.user) ? `user:${state.user.uid}:${key}` : key;
+}
+function parseStored(value, fallback){
+  try{ return value == null ? fallback : JSON.parse(value); }
+  catch(err){ console.warn('Donnée locale illisible :', err); return fallback; }
+}
 async function loadAll(){
   const startedAt = Date.now();
   try{
     const [c,a,d,e,p,ob] = await Promise.all([
       safeGet('clients'), safeGet('articles'), safeGet('documents'), safeGet('entreprise'), safeGet('preferences'), safeGet('onboarding_seen')
     ]);
-    state.clients = c ? JSON.parse(c) : [];
-    state.articles = a ? JSON.parse(a) : [];
-    state.documents = d ? JSON.parse(d) : [];
-    state.entreprise = e ? Object.assign({ nom:'', adresse:'', siret:'', tva:'', iban:'', pied:'', logo:null, logoShape:'rond' }, JSON.parse(e)) : state.entreprise;
+    state.clients = parseStored(c, []);
+    state.articles = parseStored(a, []);
+    state.documents = parseStored(d, []);
+    state.entreprise = e ? Object.assign({ nom:'', adresse:'', siret:'', tva:'', iban:'', pied:'', logo:null, logoShape:'rond' }, parseStored(e, {})) : state.entreprise;
     if(state.entreprise.logo && !state.entreprise.logoMasked){
       await refreshLogoMasked();
       await save('entreprise');
@@ -374,20 +384,20 @@ async function loadAll(){
   render();
 }
 async function safeGet(key){
-  try{ const r = await window.storage.get(key,false); return r ? r.value : null; }
-  catch(e){ return null; }
+  try{ const r = await window.storage.get(storageKey(key),false); return r ? r.value : null; }
+  catch(e){ console.warn('storage get error', key, e); return null; }
 }
 async function save(key){
   try{
     const value = JSON.stringify(state[key]);
-    await window.storage.set(key, value, false);
+    await window.storage.set(storageKey(key), value, false);
   }catch(e){ console.error('save error', key, e); toast(t('toastStorageError')); }
   cloudPushValue(key, state[key]); // synchro cloud en arrière-plan, ne bloque jamais la sauvegarde locale
 }
 async function savePreferences(){
   const prefs = { lang: state.lang, theme: state.theme, fontSize: state.fontSize, fontFamily: state.fontFamily };
   try{
-    await window.storage.set('preferences', JSON.stringify(prefs), false);
+    await window.storage.set(storageKey('preferences'), JSON.stringify(prefs), false);
   }catch(e){ console.error('save prefs error', e); }
   cloudPushValue('preferences', prefs);
 }
@@ -654,21 +664,34 @@ async function cloudPullAll(){
     }
     try{
       await Promise.all([
-        window.storage.set('clients', JSON.stringify(state.clients), false),
-        window.storage.set('articles', JSON.stringify(state.articles), false),
-        window.storage.set('documents', JSON.stringify(state.documents), false),
-        window.storage.set('entreprise', JSON.stringify(state.entreprise), false),
-        window.storage.set('preferences', JSON.stringify({lang:state.lang, theme:state.theme, fontSize:state.fontSize, fontFamily:state.fontFamily}), false),
+        window.storage.set(storageKey('clients'), JSON.stringify(state.clients), false),
+        window.storage.set(storageKey('articles'), JSON.stringify(state.articles), false),
+        window.storage.set(storageKey('documents'), JSON.stringify(state.documents), false),
+        window.storage.set(storageKey('entreprise'), JSON.stringify(state.entreprise), false),
+        window.storage.set(storageKey('preferences'), JSON.stringify({lang:state.lang, theme:state.theme, fontSize:state.fontSize, fontFamily:state.fontFamily}), false),
       ]);
     }catch(err){ console.warn('cache local après synchro error', err); }
   } else {
-    // Rien dans le cloud pour ce compte (première connexion) : on y envoie
-    // ce qui existe déjà localement sur cet appareil.
-    cloudPushValue('clients', state.clients);
-    cloudPushValue('articles', state.articles);
-    cloudPushValue('documents', state.documents);
-    cloudPushValue('entreprise', state.entreprise);
-    cloudPushValue('preferences', { lang: state.lang, theme: state.theme, fontSize: state.fontSize, fontFamily: state.fontFamily });
+    // Nouveau compte : ne jamais republier silencieusement les données d'un
+    // autre compte présentes sur l'appareil. Le compte démarre proprement.
+    state.clients = [];
+    state.articles = [];
+    state.documents = [];
+    state.entreprise = { nom:'', adresse:'', siret:'', tva:'', iban:'', pied:'', logo:null, logoShape:'rond' };
+    state.showOnboarding = true;
+    await Promise.all([
+      window.storage.set(storageKey('clients'), JSON.stringify(state.clients), false),
+      window.storage.set(storageKey('articles'), JSON.stringify(state.articles), false),
+      window.storage.set(storageKey('documents'), JSON.stringify(state.documents), false),
+      window.storage.set(storageKey('entreprise'), JSON.stringify(state.entreprise), false)
+    ]);
+    await Promise.all([
+      cloudPushValue('clients', state.clients),
+      cloudPushValue('articles', state.articles),
+      cloudPushValue('documents', state.documents),
+      cloudPushValue('entreprise', state.entreprise),
+      cloudPushValue('preferences', { lang: state.lang, theme: state.theme, fontSize: state.fontSize, fontFamily: state.fontFamily })
+    ]);
   }
 }
 function translateAuthError(err){
@@ -682,6 +705,9 @@ function translateAuthError(err){
     'auth/wrong-password': isEn ? 'Incorrect password.' : 'Mot de passe incorrect.',
     'auth/invalid-credential': isEn ? 'Incorrect email or password.' : 'E-mail ou mot de passe incorrect.',
     'auth/too-many-requests': isEn ? 'Too many attempts, please try again later.' : 'Trop de tentatives, réessayez plus tard.',
+    'auth/network-request-failed': isEn ? 'Network error. Check your internet connection.' : 'Erreur réseau. Vérifiez votre connexion internet.',
+    'auth/expired-action-code': isEn ? 'This reset link has expired. Request a new one.' : 'Ce lien de réinitialisation a expiré. Demandez-en un nouveau.',
+    'auth/invalid-action-code': isEn ? 'This reset link is invalid.' : 'Ce lien de réinitialisation est invalide.',
   };
   return map[code] || (isEn ? 'An error occurred. Please try again.' : 'Une erreur est survenue. Réessayez.');
 }
@@ -704,7 +730,8 @@ function renderAuth(){
       <form id="form-auth" style="display:flex;flex-direction:column;gap:12px;">
         <div class="field"><label>${t('authEmailLabel')}</label><input type="email" name="email" required autocomplete="email"></div>
         <div class="field"><label>${t('authPasswordLabel')}</label><input type="password" name="password" required minlength="6" autocomplete="${isSignup?'new-password':'current-password'}"></div>
-        ${state.authError ? `<div style="color:var(--stamp);font-size:0.75rem;">${escapeHtml(state.authError)}</div>` : ''}
+        ${!isSignup ? `<button type="button" class="text-btn" data-action="forgot-password">${t('authForgotPassword')}</button>` : ''}
+        ${state.authError ? `<div role="alert" style="color:var(--stamp);font-size:0.75rem;">${escapeHtml(state.authError)}</div>` : ''}
         <button type="submit" class="btn stamp" style="justify-content:center;">${isSignup ? t('authSignupBtn') : t('authLoginBtn')}</button>
       </form>
       <div style="text-align:center;margin-top:14px;font-size:0.8125rem;color:var(--ink-soft);">
@@ -731,6 +758,24 @@ function bindAuthEvents(){
       }
     }catch(err){
       state.justSignedUp = false;
+      state.authError = translateAuthError(err);
+      render();
+    }
+  };
+  const forgotBtn = app.querySelector('[data-action="forgot-password"]');
+  if(forgotBtn) forgotBtn.onclick = async ()=>{
+    const email = (form.querySelector('[name="email"]')?.value || '').trim();
+    if(!email){
+      state.authError = t('authResetInvalid');
+      render();
+      return;
+    }
+    forgotBtn.disabled = true;
+    state.authError = '';
+    try{
+      await window.firebaseAuth.sendPasswordResetEmail(email);
+      toast(t('authResetSent'));
+    }catch(err){
       state.authError = translateAuthError(err);
       render();
     }
@@ -799,6 +844,7 @@ function renderSidebar(){
     {id:'accueil', label:t('navDashboard'), icon:ICONS.ledger},
     {id:'clients', label:t('navClients'), icon:ICONS.users},
     {id:'articles', label:t('navArticles'), icon:ICONS.box},
+    {id:'assistant', label:t('navAssistant'), icon:ICONS.info},
     {id:'parametres', label:t('navSettings'), icon:ICONS.building},
     {id:'apropos', label:t('navAbout'), icon:ICONS.info},
     {id:'reglages', label:t('navPreferences'), icon:ICONS.gear},
@@ -834,6 +880,7 @@ function renderView(){
     case 'accueil': return renderAccueil();
     case 'clients': return renderClients();
     case 'articles': return renderArticles();
+    case 'assistant': return renderAssistant();
     case 'parametres': return renderParametres();
     case 'apropos': return renderApropos();
     case 'reglages': return renderReglages();
@@ -976,6 +1023,55 @@ function renderArticles(){
 }
 
 /* ============================= PARAMETRES (Mon entreprise) ============================= */
+
+function renderAssistant(){
+  const endpoint = window.CHAT_ENDPOINT || '';
+  return `
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">${t('navAssistant')}</div>
+        <h1>${t('assistantTitle')}</h1>
+        <p>${t('assistantSubtitle')}</p>
+      </div>
+    </div>
+    <div class="card assistant-card">
+      <div class="assistant-history" id="assistant-history">
+        <div class="assistant-message assistant-message-ai">
+          ${state.lang==='en' ? 'Hello. I can help you work with the information stored in your application.' : 'Bonjour. Je peux vous aider à travailler avec les informations enregistrées dans votre application.'}
+        </div>
+      </div>
+      <form id="assistant-form" class="assistant-form">
+        <textarea id="assistant-input" rows="4" placeholder="${t('assistantPlaceholder')}" required></textarea>
+        <div class="assistant-foot">
+          <div class="hint">${t('assistantPrivacy')}</div>
+          <button class="btn stamp" type="submit">${t('assistantSend')}</button>
+        </div>
+      </form>
+      ${!endpoint ? `<div class="hint warning">${t('assistantUnavailable')}</div>` : ''}
+    </div>`;
+}
+async function askAssistant(message){
+  const endpoint = window.CHAT_ENDPOINT || '';
+  if(!endpoint) throw new Error('CHAT_ENDPOINT_MISSING');
+  if(!FIREBASE_ENABLED || !state.user) throw new Error('AUTH_REQUIRED');
+  const context = {
+    lang: state.lang,
+    entreprise: { nom: state.entreprise.nom || '', siret: state.entreprise.siret || '', tva: state.entreprise.tva || '' },
+    clients: state.clients.map(c=>({id:c.id, nom:c.nom, email:c.email||'', adresse:c.adresse||'', numTva:c.numTva||''})),
+    articles: state.articles.map(a=>({id:a.id, nom:a.nom, description:a.description||'', prixUnitaireHT:a.prixUnitaireHT||0, tauxTva:a.tauxTva||0})),
+    documents: state.documents.map(d=>({id:d.id, type:d.type, numero:d.numero, date:d.date, statut:d.statut, clientId:d.clientId, totalTTC:computeTotals(d).totalTTC, conditions:d.conditions||'', notes:d.notes||''}))
+  };
+  const token = await state.user.getIdToken();
+  const res = await fetch(endpoint,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+    body:JSON.stringify({message, context})
+  });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error || 'ASSISTANT_HTTP_ERROR');
+  return data.answer || data.message || '';
+}
+
 function renderParametres(){
   const e = state.entreprise;
   return `
@@ -1436,6 +1532,39 @@ function bindPostRender(){
   const closeOnboardingBtn = app.querySelector('[data-action="close-onboarding"]');
   if(closeOnboardingBtn) closeOnboardingBtn.onclick = dismissOnboarding;
 
+  const assistantForm = app.querySelector('#assistant-form');
+  if(assistantForm) assistantForm.onsubmit = async (e)=>{
+    e.preventDefault();
+    const input = app.querySelector('#assistant-input');
+    const history = app.querySelector('#assistant-history');
+    const btn = assistantForm.querySelector('button[type="submit"]');
+    const message = (input.value || '').trim();
+    if(!message) return;
+    const userBubble = document.createElement('div');
+    userBubble.className = 'assistant-message assistant-message-user';
+    userBubble.textContent = message;
+    history.appendChild(userBubble);
+    input.value = '';
+    btn.disabled = true;
+    try{
+      const answer = await askAssistant(message);
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'assistant-message assistant-message-ai';
+      aiBubble.textContent = answer || '—';
+      history.appendChild(aiBubble);
+    }catch(err){
+      console.error('assistant error', err);
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'assistant-message assistant-message-error';
+      aiBubble.textContent = err.message === 'CHAT_ENDPOINT_MISSING' ? t('assistantUnavailable') : t('assistantError');
+      history.appendChild(aiBubble);
+    }finally{
+      btn.disabled = false;
+      input.focus();
+      history.scrollTop = history.scrollHeight;
+    }
+  };
+
   bindEditorEvents(app);
 }
 
@@ -1612,7 +1741,9 @@ function initSignaturePad(app, doc){
 }
 
 /* ============================= PDF EXPORT ============================= */
-function exportDocPdf(doc){
+function buildDocPdf(doc){
+  if(!window.jspdf || !window.jspdf.jsPDF) throw new Error('PDF_LIBRARY_UNAVAILABLE');
+  if(typeof doc !== 'object' || !doc) throw new Error('PDF_DOCUMENT_INVALID');
   persistDoc(doc, {silent:true});
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({unit:'pt', format:'a4'});
@@ -1746,8 +1877,38 @@ function exportDocPdf(doc){
     pdf.text(e.pied, marginX, 800, {maxWidth:500});
   }
 
-  pdf.save(`${doc.numero}.pdf`);
-  toast(t('toastPdfExported'));
+  return pdf;
+}
+function downloadPdfBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  // Certains navigateurs mobiles bloquent le téléchargement direct : l'URL
+  // temporaire reste disponible comme solution de secours.
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  return url;
+}
+async function exportDocPdf(doc){
+  try{
+    const pdf = buildDocPdf(doc);
+    const blob = pdf.output('blob');
+    const filename = `${doc.numero}.pdf`;
+    downloadPdfBlob(blob, filename);
+    toast(t('toastPdfExported'));
+    return {pdf, blob, filename};
+  }catch(err){
+    console.error('PDF export error', err);
+    toast(err.message === 'PDF_LIBRARY_UNAVAILABLE'
+      ? (state.lang==='en' ? 'PDF engine unavailable. Connect to the internet and reload.' : 'Le moteur PDF est indisponible. Connectez-vous à internet puis rechargez la page.')
+      : (state.lang==='en' ? 'Could not create the PDF.' : 'Impossible de créer le PDF.'));
+    return null;
+  }
 }
 
 /* ============================= ENVOI PAR E-MAIL (mailto) =============================
@@ -1759,23 +1920,50 @@ function exportDocPdf(doc){
    PDF téléchargé dans l'e-mail avant de l'envoyer. Pour un envoi 100%
    automatique (pièce jointe incluse, sans ouvrir la messagerie), il faudrait
    une fonction serveur (voir SETUP-COMPTE-ET-ASSISTANT.md, section 5). */
-function sendDocByEmail(doc){
-  exportDocPdf(doc); // télécharge le PDF, comme le bouton "Exporter en PDF"
-
+async function sendDocByEmail(doc){
   const client = state.clients.find(c=>c.id===doc.clientId) || doc.clientSnapshot;
-  const to = (client && client.email) ? client.email : '';
-  if(!to) toast(t('toastEmailNoAddress'));
+  const to = (client && client.email) ? client.email.trim() : '';
+  if(!to){
+    toast(t('toastEmailNoAddress'));
+    return;
+  }
+  const built = await exportDocPdf(doc);
+  if(!built) return;
 
-  const isQuote = doc.type === 'devis';
-  const subject = `${isQuote ? t('emailSubjectQuote') : t('emailSubjectInvoice')} ${doc.numero}`;
-  const bodyTemplate = isQuote ? t('emailBodyQuote') : t('emailBodyInvoice');
-  const body = bodyTemplate
-    .replace('{numero}', doc.numero)
-    .replace('{entreprise}', state.entreprise.nom || '');
+  const endpoint = window.EMAIL_ENDPOINT || '';
+  if(endpoint && FIREBASE_ENABLED && state.user){
+    try{
+      const token = await state.user.getIdToken();
+      const dataUrl = await built.pdf.output('datauristring');
+      const base64 = dataUrl.split(',')[1] || '';
+      const res = await fetch(endpoint,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({
+          to,
+          subject:`${doc.type==='devis' ? t('emailSubjectQuote') : t('emailSubjectInvoice')} ${doc.numero}`,
+          message:(doc.type==='devis' ? t('emailBodyQuote') : t('emailBodyInvoice'))
+            .replace('{numero}',doc.numero)
+            .replace('{entreprise}',state.entreprise.nom || ''),
+          filename:built.filename,
+          pdfBase64:base64
+        })
+      });
+      const result=await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(result.error || 'EMAIL_HTTP_ERROR');
+      toast(state.lang==='en' ? 'Email sent.' : 'E-mail envoyé.');
+      return;
+    }catch(err){
+      console.error('automatic email error',err);
+      toast(state.lang==='en' ? 'Automatic sending failed; your PDF was downloaded.' : 'Envoi automatique impossible ; le PDF a été téléchargé.');
+    }
+  }
 
+  // Fallback universel : mailto + PDF déjà téléchargé.
+  const subject = `${doc.type==='devis' ? t('emailSubjectQuote') : t('emailSubjectInvoice')} ${doc.numero}`;
+  const bodyTemplate = doc.type==='devis' ? t('emailBodyQuote') : t('emailBodyInvoice');
+  const body = bodyTemplate.replace('{numero}', doc.numero).replace('{entreprise}', state.entreprise.nom || '');
   const mailtoUrl = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  // Laisse un court délai pour que le téléchargement du PDF se déclenche
-  // avant que le navigateur ne change de contexte vers l'application mail.
   setTimeout(()=>{ window.location.href = mailtoUrl; }, 300);
 }
 
