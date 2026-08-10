@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Même logique que Firestore : chaque utilisateur a son propre
+    // dossier users/{uid}/ et ne peut accéder à rien d'autre.
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Limite de taille (5 Mo) et type de fichier (images uniquement) pour
+    // les logos et signatures, pour éviter tout abus de stockage.
+    match /users/{userId}/entreprise/logo.png {
+      allow write: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.size < 5 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

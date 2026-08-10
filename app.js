@@ -1889,17 +1889,25 @@ function downloadPdfBlob(blob, filename){
   document.body.appendChild(a);
   a.click();
   a.remove();
-  // Certains navigateurs mobiles bloquent le téléchargement direct : l'URL
-  // temporaire reste disponible comme solution de secours.
   setTimeout(()=>URL.revokeObjectURL(url), 60000);
   return url;
 }
-async function exportDocPdf(doc){
+function exportDocPdf(doc){
   try{
+    // Important : le bouton PDF doit déclencher l'enregistrement dans le
+    // même geste utilisateur. pdf.save() évite le blocage de certains
+    // Safari/iOS/Android qui refusent un téléchargement Blob déclenché
+    // après une promesse ou une tâche asynchrone.
     const pdf = buildDocPdf(doc);
-    const blob = pdf.output('blob');
     const filename = `${doc.numero}.pdf`;
-    downloadPdfBlob(blob, filename);
+    let blob;
+    try { blob = pdf.output('blob'); } catch (_) { blob = null; }
+    try {
+      pdf.save(filename);
+    } catch (saveErr) {
+      if (!blob) throw saveErr;
+      downloadPdfBlob(blob, filename);
+    }
     toast(t('toastPdfExported'));
     return {pdf, blob, filename};
   }catch(err){
@@ -1927,7 +1935,7 @@ async function sendDocByEmail(doc){
     toast(t('toastEmailNoAddress'));
     return;
   }
-  const built = await exportDocPdf(doc);
+  const built = exportDocPdf(doc);
   if(!built) return;
 
   const endpoint = window.EMAIL_ENDPOINT || '';

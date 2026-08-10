@@ -1,0 +1,9 @@
+Le Registre v1.1.1 — correctif PDF
+
+- Export des devis/factures déclenché directement par jsPDF.save() dans le geste utilisateur.
+- Fallback Blob conservé si save() échoue.
+- Suppression de l’attente asynchrone inutile avant l’export.
+- Le PDF reste disponible comme objet pour l’envoi e-mail.
+- Objectif : corriger les cas où le guide se télécharge mais pas les devis/factures, notamment sur navigateurs mobiles.
+
+Tests statiques effectués : structure ZIP, présence style.css/icons, syntaxe JavaScript Node.
